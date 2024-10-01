@@ -1,5 +1,5 @@
 # Dmoney Test Automation
-## Project Summary: In this project i have perform tha major functionality and Intigration Testing with User Activity roleways. Here i have coverd User criteria testing also.
+## Project Summary: In this project i have perform tha major functionality and Intigration Testing with User Activity roleways. Here i have coverd User criteria testing and balance statement also
 
 ## Technology I have used here:
 - Postman
