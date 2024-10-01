@@ -1,0 +1,3502 @@
+{
+	"info": {
+		"_postman_id": "a9aa2f5c-15c9-44b2-aecd-47fabf7221b7",
+		"name": "Dmoney_Rest_API_B12_Sumon",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37977390"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "Login With Valid Creds",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var url=\"http://dmoney.roadtocareer.net\"\r",
+									"\r",
+									"pm.collectionVariables.set(\"baseUrl\",url)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json()\r",
+									"let token = jsonData.token;\r",
+									"pm.collectionVariables.set(\"token\", token)\r",
+									"\r",
+									"pm.test(\"User can login successfully\", function () {\r",
+									"    pm.expect(jsonData.message).to.contains(\"Login successful\");\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"admin@roadtocareer.net\",\r\n    \"password\":\"1234\"\r\n\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://dmoney.roadtocareer.net/user/login",
+							"protocol": "https",
+							"host": [
+								"dmoney",
+								"roadtocareer",
+								"net"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login with invalid Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\"Check the inputed email is valid, If invalid then can not login \", function () {\r",
+									"    pm.expect(jsonData.message).includes(\"User not found\");\r",
+									"});\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n{\r\n    \"email\":\"adminS@roadtocareer.net\",\r\n    \"password\": \"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login with invalid Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Check login with invalid Password\", function () {\r",
+									"    \r",
+									"    pm.expect(jsonData.message).includes(\"Password incorrect\");\r",
+									"});\r",
+									"pm.test(\"Status code is 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n{\r\n    \"email\":\"admin@roadtocareer.net\",\r\n    \"password\": \"123a@4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Agent Create",
+			"item": [
+				{
+					"name": "Agent Account Create",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randomId=_.random(10000,99999)\r",
+									"let phoneNumber=\"0170\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomId\",randomId)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"let jsonData= pm.response.json();\r",
+									"let id= jsonData.user.id;\r",
+									"let phonenumber=jsonData.user.phone_number;\r",
+									"let email = jsonData.user.email;\r",
+									"pm.collectionVariables.set(\"agentId\",id)\r",
+									"pm.collectionVariables.set(\"agent_phone_number\",phonenumber)\r",
+									"pm.collectionVariables.set(\"agent_email\",email)\r",
+									"\r",
+									"pm.test(\"Check Agent created Successfully\", function () {\r",
+									"    pm.expect(jsonData.message).includes(\"User created\");\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"name\":\"{{$randomFullName}}\", \r\n    \"email\":\"{{$randomEmail}}\", \r\n    \"password\": \"1234\",\r\n    \"phone_number\": \"{{randomPhoneNumber}}\",\r\n    \"nid\": \"1784849933\",\r\n    \"role\": \"Agent\"\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Agent Create by existing  Phone number",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json()\r",
+									"pm.test(\"Check Agent Account already used this number, Should not Create multiple agent by same number\", function () {\r",
+									"    pm.expect(jsonData.message).includes(\"User already exists\");\r",
+									"});\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"name\":\"{{$randomFullName}}\", \r\n    \"email\":\"{{$randomEmail}}\", \r\n    \"password\": \"1234\",\r\n    \"phone_number\": \"{{agent_phone_number}}\",\r\n    \"nid\": \"1784849933\",\r\n    \"role\": \"Agent\"\r\n\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Agent Create by existing  email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json()\r",
+									"pm.test(\"Check Agent Account already used this email, Should not Create multiple agent by same email\", function () {\r",
+									"    pm.expect(jsonData.message).includes(\"User already exists\");\r",
+									"});\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"let phoneNumber=\"0170\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"name\":\"{{$randomFullName}}\", \r\n    \"email\":\"{{agent_email}}\", \r\n    \"password\": \"1234\",\r\n    \"phone_number\": \"{{randomPhoneNumber}}\",\r\n    \"nid\": \"1784849933\",\r\n    \"role\": \"Agent\"\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Agent with Invalid Email",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"var phoneNumber=\"0170\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData= pm.response.json();\r",
+									"\r",
+									"var message = jsonData.message;\r",
+									"\r",
+									"pm.test(\"Check Email Format is Valid, Otherwise Should not create account by invalid email\", function () {\r",
+									"    pm.expect(message).contains(\"\\\"email\\\" must be a valid email\");\r",
+									"});\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\":\"Smn9933$\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomPhoneNumber}}\",\r\n    \"nid\":\"6002547921\",\r\n    \"role\":\"Agent\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Agent with Invalid Phone Number",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomId=_.random(100000,999999)\r",
+									"\r",
+									"// Generate Random Alphabnumeric phone number \r",
+									"var phoneNumber = randomId + \"%$@#a\";\r",
+									"pm.collectionVariables.set(\"randomInvalidPhoneNumber\",phoneNumber);\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData= pm.response.json();\r",
+									"\r",
+									"var message = jsonData.message;\r",
+									"\r",
+									"pm.test(\"Need a Valid phone_number\", function () {\r",
+									"    pm.expect(message).contains(\"\\\"phone_number\\\" length must be at least 11 characters long\");\r",
+									"});\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"343\",\r\n    \"nid\":\"6002547921\",\r\n    \"role\":\"Agent\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Agent with Invalid Phone Number",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomId=_.random(100000,999999)\r",
+									"\r",
+									"// Generate Random Alphabnumeric phone number \r",
+									"var phoneNumber = randomId + \"%$@#a\";\r",
+									"pm.collectionVariables.set(\"randomInvalidPhoneNumber\",phoneNumber);\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData= pm.response.json();\r",
+									"\r",
+									"var message = jsonData.message;\r",
+									"\r",
+									"pm.test(\"Need a Valid phone_number\", function () {\r",
+									"    pm.expect(message).contains(\"\\\"phone_number\\\" must be a valid\");\r",
+									"});\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomInvalidPhoneNumber}}\",\r\n    \"nid\":\"6002547921\",\r\n    \"role\":\"Agent\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Agent with Invalid role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"let phoneNumber=\"0170\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData= pm.response.json();\r",
+									"\r",
+									"let message = jsonData.message;\r",
+									"\r",
+									"pm.test(\"Need a Valid Role\", function () {\r",
+									"    pm.expect(message).contains(\"Invalid role: bbb. This role does not exist in the Role table.\");\r",
+									"});\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\":\"agent{{$randomEmail}}\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomPhoneNumber}}\",\r\n    \"nid\":\"6002547921\",\r\n    \"role\":\"bbb\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Agent with Invalid NID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randomId=_.random(10000,99999)\r",
+									"let phoneNumber=\"0170\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomId\",randomId)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData= pm.response.json();\r",
+									"\r",
+									"var message = jsonData.message;\r",
+									"\r",
+									"pm.test(\"Need a Valid nid\", function () {\r",
+									"    pm.expect(message).contains(\"\\\"nid\\\" must be a valid\");\r",
+									"});\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\":\"{{$randomEmail}}\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomPhoneNumber}}\",\r\n    \"nid\":\"jdfkjsdf7887\",\r\n    \"role\":\"agent\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Customer",
+			"item": [
+				{
+					"name": "Create Customer_1 with valid creds",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randomId=_.random(10000,99999)\r",
+									"let phoneNumber=\"0150\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomId\",randomId)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData= pm.response.json();\r",
+									"var id= jsonData.user.id;\r",
+									"var phonenumber=jsonData.user.phone_number;\r",
+									"var email = jsonData.user.email;\r",
+									"pm.collectionVariables.set(\"Customer_1_Id_Sumon\",id)\r",
+									"pm.collectionVariables.set(\"Customer_1_phone_number_Sumon\",phonenumber)\r",
+									"pm.collectionVariables.set(\"Customer_1_email_Sumon\",email)\r",
+									"\r",
+									"pm.test(\"Check Agent created Successfully\", function () {\r",
+									"    pm.expect(jsonData.message).includes(\"User created\");\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"C1_Sumon{{$randomFullName}}\",\r\n    \"email\": \"C1_Sumon_1{{randomId}}@test.com\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomPhoneNumber}}\",\r\n    \"nid\":\"1784849933\",\r\n    \"role\":\"Customer\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Customer_2 with valid creds",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randomId=_.random(10000,99999)\r",
+									"let phoneNumber=\"0150\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomId\",randomId)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData= pm.response.json();\r",
+									"var id= jsonData.user.id;\r",
+									"var phonenumber=jsonData.user.phone_number;\r",
+									"var email = jsonData.user.email;\r",
+									"pm.collectionVariables.set(\"Customer_2_Id_Sujon\",id)\r",
+									"pm.collectionVariables.set(\"Customer_2_phone_number_Sujon\",phonenumber)\r",
+									"pm.collectionVariables.set(\"Customer_2_email_Sujon\",email)\r",
+									"\r",
+									"pm.test(\"Check Agent created Successfully\", function () {\r",
+									"    pm.expect(jsonData.message).includes(\"User created\");\r",
+									"});\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"C2_Sujon{{$randomFullName}}\",\r\n    \"email\": \"C2_Sujon{{randomId}}@test.com\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomPhoneNumber}}\",\r\n    \"nid\":\"1784849933\",\r\n    \"role\":\"Customer\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Customer with Duplicate User email",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if customer input existing email\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.contains(\"User already exists\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\":\"{{Customer_email_1}}\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomPhoneNumber}}\",\r\n    \"nid\":\"123456789\",\r\n    \"role\":\"Customer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Customer with Duplicate User Phone Number",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if customer input existing email\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.contains(\"User already exists\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"email\":\"{{Customer_email_1}}\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"nid\":\"123456789\",\r\n    \"role\":\"Customer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Merchant",
+			"item": [
+				{
+					"name": "Create Merchant Account",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomId=_.random(10000,99999)\r",
+									"var phoneNumber=\"0150\"+_.random(1000000,9999999)\r",
+									"pm.collectionVariables.set(\"randomId\",randomId)\r",
+									"pm.collectionVariables.set(\"randomPhoneNumber\",phoneNumber)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Merchant created successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.contains(\"User created\");\r",
+									"});\r",
+									"\r",
+									"var jsonData= pm.response.json();\r",
+									"var id= jsonData.user.id;\r",
+									"var phonenumber=jsonData.user.phone_number;\r",
+									"var email = jsonData.user.email;\r",
+									"pm.collectionVariables.set(\"Merchant_id\",id)\r",
+									"pm.collectionVariables.set(\"Merchant_Phone_number\",phonenumber)\r",
+									"pm.collectionVariables.set(\"Merchant\",email)\r",
+									"\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"email\": \"Merchant{{randomId}}@test.com\",\r\n    \"password\":\"1234\",\r\n    \"phone_number\":\"{{randomPhoneNumber}}\",\r\n    \"nid\":\"12365678\",\r\n    \"role\":\"Merchant\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deposit To Agent",
+			"item": [
+				{
+					"name": "Deposit to Agent with Valid Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"pm.test(\"Check System deposit money to Agent\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).contains(\"Deposit successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":10000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit to Agent minimum Valid amount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"pm.test(\"Check System deposit money to Agent minimum amount  Limit\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).contains(\"Deposit successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit To Invalid Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if System can not deposit money to invalid  Agent\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).contains(\"Account does not exist\");\r",
+									"});\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"015142140\",\r\n    \"amount\":10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit to Agent with Invalid Lower Amount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"pm.test(\"Check System can not deposit money to Agent with Invalid lower Amount\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).contains(\"Minimum deposit amount is 10 tk and maximum deposit amount is 10000 tk\")\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\": 9\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit to Agent with Excesscive Higher Amount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});\r",
+									"pm.test(\"Check System can not deposit money to Agent with Excessive higher Amount\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).contains(\"Limit exceeded. You can deposit a maximum of 10000.00 tk to this customer.\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":9990\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deposit To Customer",
+			"item": [
+				{
+					"name": "Deposit To Invalid Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if Agent can not deposit money to invalid  Customer\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Account does not exist\")\r",
+									"})\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{agent_phone_number}}\",\r\n    \"to_account\":\"0182154876\",\r\n    \"amount\":2000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit From Invalid Agent To valid Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if Agent can not deposit money to invalid  Customer\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Account does not exist\")\r",
+									"})\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"017293827\",\r\n    \"to_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"amount\":2000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit To Customer with Invalid Lower Amount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check Customer can not deposit inavlid lower amount . \",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Minimum deposit amount is 10 tk\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{agent_phone_number}}\",\r\n    \"to_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"amount\":9\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit To Customer With Sufficient Amount",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Customer deposit is successful\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Deposit successful\")\r",
+									"})\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{agent_phone_number}}\",\r\n    \"to_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"amount\":200\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit To Customer Amount More Than Agents Balance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check Customer can not deposit if agents balance  have is lower than Deposit amount. \",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Insufficient balance\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{agent_phone_number}}\",\r\n    \"to_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n    \"amount\": 80511\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit from invalid agent and customer account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"If both account invalid, then can not deposit anyone. \",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"From Account does not exist\")\r",
+									"})\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{agent_phone_number3}}\",\r\n    \"to_account\":\"{{Customer_2_phone_number_Sujon4}}\",\r\n    \"amount\": 800\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Check Agent Balance",
+			"item": [
+				{
+					"name": "Check Agent Balance for Valid Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									"    var blnc= jsonData.balance;\r",
+									"\r",
+									"pm.test(\"Agent Can Check Balance with Valid Creds\",()=>{\r",
+									"    pm.expect(msg).contains(\"User balance\");\r",
+									"    pm.expect(blnc).to.eql(8050);\r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{secretKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/balance/{{agent_phone_number}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{agent_phone_number}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check  InValid Agent balance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									"    \r",
+									"\r",
+									"pm.test(\"Agent Can not Check Balance with InValid Creds\",()=>{\r",
+									"    pm.expect(msg).contains(\"User not found\");\r",
+									"   \r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/balance/0152133234",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"0152133234"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Send Money Operations",
+			"item": [
+				{
+					"name": "Send Money bwteen two valid customers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if both accounts is valid then send money succssesfully\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Send money successful\")\r",
+									"})\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"to_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n    \"amount\":10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/sendmoney",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"sendmoney"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sned money from agent to merchant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"No agent account can not ber send money to merchant\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"From/To account should not be an agent account\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{agent_phone_number}}\",\r\n    \"to_account\":\"{{Merchant_Phone_number}}\",\r\n    \"amount\":400\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/sendmoney",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"sendmoney"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Negative amount between two valid customers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if sending amount is valid, otherwise can not send \",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Minimum amount is 10 tk\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"to_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n    \"amount\":-10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/sendmoney",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"sendmoney"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Money  from invalid customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if sender account is invalid then should not send money\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"From Account does not exist\")\r",
+									"})\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"29384647\",\r\n    \"to_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n    \"amount\":50\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/sendmoney",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"sendmoney"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Money  to invalid customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if reciver account is invalid then should not send money\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"To Account does not exist\")\r",
+									"})\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n    \"to_account\":\"4748838383\",\r\n    \"amount\":50\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/sendmoney",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"sendmoney"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer Withdraw from Agent",
+			"item": [
+				{
+					"name": "Money Withdraw from  valid customer to valid Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Valid customer can withdraw  to valid agent\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Withdraw successful\")\r",
+									"})\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":1000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Money Withdraw from  valid customer to valid Agent Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Valid customer can withdraw  to valid agent\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Withdraw successful\")\r",
+									"})\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{agent_phone_number}}\",\r\n    \"to_account\":\"{{Merchant_Phone_number}}\",\r\n    \"amount\":1000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw i  from insufficient balance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Valid customer can withdraw  to valid agent\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Insufficient balance\");\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208)\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":8000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid lower amount withdraw from agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Minimum withdraw amount should be 10TK\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Minimum withdraw amount is 10 tk\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":9\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Money Withdraw from invalid customer to valid Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"invalid customer can not withdraw from valid agent\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"From Account does not exist\")\r",
+									"})\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_1_phone_number_Sumon4}}\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":1000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Money Withdraw from customer to invalid Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Valid customer can not withdraw  from invalid agent\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"To Account does not exist\")\r",
+									"})\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"to_account\":\"{{agent_phone_number2}}\",\r\n    \"amount\":1000\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Money Withdraw By Customer With Sufficient Amount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if Customer can  withdraw money with Sufficient Amount\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    var trnxId = jsonData.trnxId;\r",
+									"    pm.collectionVariables.set(\"trnxID\",trnxId)\r",
+									"    pm.expect(message).contains(\"Withdraw successful\")\r",
+									"})\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n    \"to_account\":\"{{agent_phone_number}}\",\r\n    \"amount\":200\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/withdraw",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Check Customer Balance",
+			"item": [
+				{
+					"name": "Check Customers 1 Balance  with velid creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									"    var blnc= jsonData.balance;\r",
+									"\r",
+									"pm.test(\"Customer 1 can check Balance with valid Creds\",()=>{\r",
+									"    pm.expect(msg).contains(\"User balance\");\r",
+									"    pm.expect(blnc).to.eql(620);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/balance/{{Customer_1_phone_number_Sumon}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer_1_phone_number_Sumon}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Statement Customers 1 with velid creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									"    var blnc= jsonData.balance;\r",
+									"\r",
+									"pm.test(\"Customer 1 can check Balance with valid Creds\",()=>{\r",
+									"    pm.expect(msg).contains(\"User balance\");\r",
+									"    pm.expect(blnc).to.eql(1390);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/statement/{{Customer_1_phone_number_Sumon}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"statement",
+								"{{Customer_1_phone_number_Sumon}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check  Customer 1 statement with Valid Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									" \r",
+									"// {{baseUrl}}/transaction/statement/{{Customer_Phone_number_1}}\r",
+									"\r",
+									"pm.test(\"Customer 1 can check Statements with valid Creds\",()=>{\r",
+									"    pm.expect(msg).contains(\"Transaction list\");\r",
+									"   \r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/search/{{trnxID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"search",
+								"{{trnxID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check  Customer 1 statement with invalid customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									" \r",
+									"// {{baseUrl}}/transaction/statement/{{Customer_Phone_number_1}}\r",
+									"\r",
+									"pm.test(\"Customer 1 can check Statements with valid Creds\",()=>{\r",
+									"    pm.expect(msg).contains(\"User not found\");\r",
+									"   \r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/statement/{{Customer_1_phone_number_Sum2on}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"statement",
+								"{{Customer_1_phone_number_Sum2on}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Check Customer 2 Balance",
+			"item": [
+				{
+					"name": "Check Customers 2 Balance  with velid creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									"    var blnc= jsonData.balance;\r",
+									"\r",
+									"pm.test(\"Customer 2 can check Balance with valid Creds\",()=>{\r",
+									"    pm.expect(msg).contains(\"User balance\");\r",
+									"    pm.expect(blnc).to.eql(0);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/balance/{{Customer_2_phone_number_Sujon}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Customer_2_phone_number_Sujon}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Customers 2 Balance  statement  without account number",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"    var msg= jsonData.message;\r",
+									"    var blnc= jsonData.balance;\r",
+									"\r",
+									"pm.test(\"Without account number statement can not be displayed\",()=>{\r",
+									"    pm.expect(msg).contains(\"GET /transaction/statement/ Not Found\");\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/statement/{{Customer_2_phone_number_Sujon}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"statement",
+								"{{Customer_2_phone_number_Sujon}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer payment to Merchant",
+			"item": [
+				{
+					"name": "Payment to Marchant from customer 2 valid creds",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Payment is successful\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Payment successful\")\r",
+									"})\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " \r\n {\r\n     \"from_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n     \"to_account\":\"{{Merchant_Phone_number}}\",\r\n     \"amount\":50\r\n }  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payment customer to merchant insufficient balance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if current balance less then payment balance then can not payment\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"Insufficient balance\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " \r\n {\r\n     \"from_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n     \"to_account\":\"{{Merchant_Phone_number}}\",\r\n     \"amount\":500\r\n }  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payment from customer to customer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Payment is successful\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"From A/C should be customer or agent and To A/C should be merchant type\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " \r\n {\r\n     \"from_account\":\"{{Customer_2_phone_number_Sujon}}\",\r\n     \"to_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n     \"amount\":50\r\n }  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payment from customer to agent",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Payment is successful\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"From A/C should be customer or agent and To A/C should be merchant type\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " \r\n {\r\n     \"from_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n     \"to_account\":\"{{agent_phone_number}}\",\r\n     \"amount\":50\r\n }  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payment from agent to customer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Payment is successful\",()=>{\r",
+									"    var jsonData= pm.response.json();\r",
+									"    var message= jsonData.message;\r",
+									"    pm.expect(message).contains(\"From A/C should be customer or agent and To A/C should be merchant type\")\r",
+									"})\r",
+									"pm.test(\"Status code is 208\", function () {\r",
+									"    pm.response.to.have.status(208);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " \r\n {\r\n    \r\n    \"from_account\":\"{{agent_phone_number}}\",\r\n     \"to_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n     \r\n     \"amount\":200\r\n }  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Merchant Balance",
+			"item": [
+				{
+					"name": "Cheak Merchant balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/balance/{{Merchant_Phone_number}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"{{Merchant_Phone_number}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cheak Merchant balance with invalid phone number",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transaction/balance/01505679976m",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"balance",
+								"01505679976m"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "System Deposit",
+			"item": [
+				{
+					"name": "Deposit system to merchant with Valid Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"pm.test(\"Check System deposit money to Agent\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).contains(\"Deposit successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Merchant_Phone_number}}\",\r\n    \"amount\":10000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit to Customer with Valid Creds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"pm.test(\"Check System deposit money to Agent\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).contains(\"Deposit successful\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer {{token}}"
+							},
+							{
+								"key": "X-AUTH-SECRET-KEY",
+								"value": "{{partnerKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_account\":\"SYSTEM\",\r\n    \"to_account\":\"{{Customer_1_phone_number_Sumon}}\",\r\n    \"amount\":100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction/deposit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://dmoney.roadtocareer.net"
+		},
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiYWRtaW5Acm9hZHRvY2FyZWVyLm5ldCIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTcyNzcwMTYyOSwiZXhwIjoxNzI3NzA1MjI5fQ.qEMYd-_BQhk4Gbu_2JAVMozaOL0JhpAK0JZePScIbAU"
+		},
+		{
+			"key": "randomId",
+			"value": 66038
+		},
+		{
+			"key": "randomPhoneNumber",
+			"value": "01506761226"
+		},
+		{
+			"key": "partnerKey",
+			"value": "ROADTOSDET",
+			"type": "string"
+		},
+		{
+			"key": "agentId",
+			"value": 24394
+		},
+		{
+			"key": "agent_phone_number",
+			"value": "01707896002"
+		},
+		{
+			"key": "agent_email",
+			"value": "Virgil18@hotmail.com"
+		},
+		{
+			"key": "randomInvalidPhoneNumber",
+			"value": "580296%$@#a"
+		},
+		{
+			"key": "Customer_1_Id_Sumon",
+			"value": 24397
+		},
+		{
+			"key": "Customer_1_phone_number_Sumon",
+			"value": "01505969773"
+		},
+		{
+			"key": "Customer_1_email_Sumon",
+			"value": "C1_Sumon_168662@test.com"
+		},
+		{
+			"key": "Customer_2_Id_Sujon",
+			"value": 24398
+		},
+		{
+			"key": "Customer_2_phone_number_Sujon",
+			"value": "01508114061"
+		},
+		{
+			"key": "Customer_2_email_Sujon",
+			"value": "C2_Sujon38673@test.com"
+		},
+		{
+			"key": "Merchant_id",
+			"value": 24399
+		},
+		{
+			"key": "Merchant_Phone_number",
+			"value": "01506761226"
+		},
+		{
+			"key": "Merchant",
+			"value": "Merchant66038@test.com"
+		},
+		{
+			"key": "trnxID",
+			"value": null
+		}
+	]
+}
